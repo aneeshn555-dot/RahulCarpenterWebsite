@@ -54,14 +54,18 @@ if(contactForm) {
     contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        // Simple UI feedback for the demo
         const btn = contactForm.querySelector('.submit-btn');
         const originalText = btn.innerText;
         
         btn.innerText = 'Sending...';
         btn.style.opacity = '0.8';
         
-        setTimeout(() => {
+        const formData = new FormData(contactForm);
+        fetch(contactForm.action, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors' // Allows submitting across origins without CORS errors for Google Forms
+        }).then(() => {
             btn.innerText = 'Message Sent Successfully!';
             btn.style.backgroundColor = '#2ecc71';
             btn.style.color = '#fff';
@@ -69,7 +73,6 @@ if(contactForm) {
             
             contactForm.reset();
             
-            // Revert button after 3 seconds
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.style.backgroundColor = '';
@@ -77,6 +80,12 @@ if(contactForm) {
                 btn.style.borderColor = '';
                 btn.style.opacity = '1';
             }, 3000);
-        }, 1500);
+        }).catch((err) => {
+            btn.innerText = 'Error! Try again message.';
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.opacity = '1';
+            }, 3000);
+        });
     });
 }
